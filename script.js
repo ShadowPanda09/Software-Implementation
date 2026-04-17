@@ -1,20 +1,32 @@
-let startNodeCoords = [Number(document.getElementById("startY").value), Number(document.getElementById("startX").value)]
-let goalNodeCoords = [Number(document.getElementById("goalY").value), Number(document.getElementById("goalX").value)]
-console.log(startNodeCoords)
-console.log(goalNodeCoords)
-
+let startNode;
+let goalNode;
+let map;
 class Node{
 
     constructor(coords, tile){
         this.coords = coords
-        this.children;
+        this.y = coords[0]
+        this.x = coords[1]
+        this.children = [];
         this.parent;
         this.wall = false
         this.tile = tile
     }
 
     findChildren(){
-        
+        if (map[this.y + 1][this.x]){
+            this.children.push(map[this.y + 1][this.x])
+        }
+        if (map[this.y - 1][this.x]){
+            this.children.push(map[this.y - 1][this.x])
+        }
+        if (map[this.y][this.x + 1]){
+            this.children.push(map[this.y][this.x + 1])
+        }
+        if (map[this.y][this.x - 1]){
+            this.children.push(map[this.y][this.x - 1])
+        }
+        console.log(this.children)
     }
 
 
@@ -46,7 +58,7 @@ class Algorithm{
     run(){}
 
     check(){
-        if (this.current.coords == goalNodeCoords){
+        if (this.current.coords == goalNode.coords){
             return true;
         } else {
             return false;
@@ -62,24 +74,20 @@ class Algorithm{
     buildBoard(startNode, goalNode){
         for (let y = 0; y < map.length; y++){
             for (let x = 0; x < map[y].length; x++){
-                if (map[y][x].wall == true){
-                    map[y][x].tile.style.backgroundColor = "black"
-                } else if (map[y][x].coords == startNode){
+                if (map[y][x].x == startNode.x && map[y][x].y == startNode.y){
                     map[y][x].tile.style.backgroundColor = "green"
-                } else if (map[y][x].coords == goalNode){
+                } else if (map[y][x].x == goalNode.x && map[y][x].y == goalNode.y){
                     map[y][x].tile.style.backgroundColor = "red"
+                } else if(map[y][x].wall == true){
+                    map[y][x].tile.style.backgroundColor = "black"
                 } else{
                     map[y][x].tile.style.backgroundColor = "white"
-                }
-                console.log(map[y][x].coords)
-                console.log(startNode)
-                console.log(goalNode)
-                console.log(map[y][x].coords == startNode)
-                console.log(map[y][x].coords == goalNode)
-                
+                } 
             }
         }
     }
+
+    
 }
 
 class BFS extends Algorithm{
@@ -88,7 +96,12 @@ class BFS extends Algorithm{
     }
 
     run(){
-        
+        let cur = this.current
+        cur = startNode
+        console.log(cur)
+        while (cur != startNode){
+            cur.children = this.cur.findChildren()
+        }
     }
 }
 
@@ -99,7 +112,7 @@ function createMap(width, height){
     let nodes = [];
     let x = 0;
     let y = 0;
-
+    document.getElementById("table").replaceChildren("")
 
     for (let i = 0; i < height; i++){
         let row = document.createElement("tr")
@@ -117,7 +130,7 @@ function createMap(width, height){
                 } else{
                     nodes[i][j].wall = true; 
                 }
-                BFSal.buildBoard(map[0][0], map[5][5]);})
+                BFSal.buildBoard(startNode,goalNode);})
             row.appendChild(nodes[i][j].tile)
             x++;
         }
@@ -130,9 +143,17 @@ function createMap(width, height){
     return nodes
 }
 
-map = createMap(8,8)
+map = createMap(10,10)
+
 document.getElementById("submit").addEventListener("click", function(){
-    console.log("ran")
-    startNodeCoords = [Number(document.getElementById("startY").value), Number(document.getElementById("startX").value)]
-    goalNodeCoords = [Number(document.getElementById("goalY").value), Number(document.getElementById("goalX").value)]
-    BFSal.buildBoard(startNodeCoords, goalNodeCoords)})
+    startNode = map[Number(document.getElementById("startY").value)][Number(document.getElementById("startX").value)]
+    goalNode = map[Number(document.getElementById("goalY").value)][Number(document.getElementById("goalX").value)]
+    let height = Number(document.getElementById("height").value)
+    let width = Number(document.getElementById("width").value)
+    map = createMap(height, width)
+    for (let i = 0; i < height; i++){
+        for (let j = 0; j < width; j++){
+            map[j][i].wall = false
+        }}
+    BFSal.buildBoard(startNode, goalNode)
+})

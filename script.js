@@ -43,23 +43,31 @@ class Algorithm{
     }
     
     color(){
-        console.log("ran")
         for (let i = 0; i < this.visited.length; i++){
             this.visited[i].tile.style.backgroundColor = "lightgreen"
         }
         for (let y = 0; y < map.length; y++){
             for (let x = 0; x < map[y].length; x++){
                 if (map[y][x].x == startNode.x && map[y][x].y == startNode.y){
-                            map[y][x].tile.style.backgroundColor = "green"
-                        } else if (map[y][x].x == goalNode.x && map[y][x].y == goalNode.y){
-                            map[y][x].tile.style.backgroundColor = "red"}
-                        }
-                    }
+                    map[y][x].tile.style.backgroundColor = "green"
+                } else if (map[y][x].x == goalNode.x && map[y][x].y == goalNode.y){
+                    map[y][x].tile.style.backgroundColor = "red"
+                } else if (map[y][x].wall == true){
+
+                }
+            }
+        }
     }
 
     effPath(){
-        for (let i = 0; i < this.path.length; i++){
-            this.path[i].tile.style.backgroundColor = "dark green"
+        for (let i = 1; i < this.path.length; i++){
+            this.path[i].tile.style.backgroundColor = "cyan"
+        }
+        for (let y = 0; y < map.length; y++){
+            for (let x = 0; x < map[y].length; x++){
+                map[y][x].parent = "";
+                map[y][x].children = []
+            }
         }
     }
 
@@ -73,8 +81,10 @@ class Algorithm{
         }
     }
 
-    traceBack(startNode){
+    traceBack(){
+        this.path = []
         while (this.current != startNode){
+            this.path.push(this.current)
             this.current = this.current.parent;
         }
     }
@@ -106,38 +116,33 @@ class BFS extends Algorithm{
     run(){
         let cur = startNode;
         let counter = 0;
-        let queueChild = true;
         this.visited = []
         this.queue = []
         this.visited.push(cur);
         this.current = cur;
         while (this.current.x != goalNode.x || this.current.y != goalNode.y){
-            let beenThere = false;
             this.current.findChildren();
             
             for (let b = 0; b < this.current.children.length; b++){
-                if (this.visited.includes(this.current.children[b]) == false && this.queue.includes(this.current.children[b]) == false){
+                if (this.visited.includes(this.current.children[b]) == false && this.queue.includes(this.current.children[b]) == false && this.current.children[b].wall == false){
+                    this.current.children[b].parent = this.current
                     this.queue.push(this.current.children[b]);
-                    console.log(this.queue);
                 }
             }
 
             let toAdd = this.queue[0];
 
             if (this.visited.includes(this.queue[0]) == true){
-                beenThere = true
             } else{
                 this.current = this.queue.shift()
             }
 
             this.visited.push(toAdd);
-            console.log(this.visited);
-            console.log(this.current);
-            console.log(this.current == goalNode)
             counter++;
         }
-        console.log(counter)
         this.color()
+        this.traceBack(this.current)
+        this.effPath()
     }
 }
 
@@ -184,10 +189,11 @@ document.getElementById("submit").addEventListener("click", function(){
     goalNode = map[Number(document.getElementById("goalY").value)][Number(document.getElementById("goalX").value)]
     let height = Number(document.getElementById("height").value)
     let width = Number(document.getElementById("width").value)
-    map = createMap(height, width)
+    map = createMap(width, height)
     for (let i = 0; i < height; i++){
         for (let j = 0; j < width; j++){
-            map[j][i].wall = false
+            if (map[j][i]){
+                map[j][i].wall = false}
         }}
     BFSal.buildBoard(startNode, goalNode)
 })
@@ -195,7 +201,7 @@ document.getElementById("submit").addEventListener("click", function(){
 window.addEventListener("load", function(){
     map = createMap(10,10)
     startNode = map[0][0]
-    goalNode = map[9][9]
+    goalNode = map[8][8]
     BFSal.buildBoard(startNode, goalNode)
 })
 

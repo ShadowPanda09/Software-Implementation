@@ -44,7 +44,10 @@ class Algorithm{
     
     color(){
         for (let i = 0; i < this.visited.length; i++){
-            this.visited[i].tile.style.backgroundColor = "lightgreen"
+            if (this.visited[i].y == startNode.y && this.visited[i].x == startNode.x){
+
+            }else{
+                this.visited[i].tile.style.backgroundColor = "lightgreen"}
         }
         for (let y = 0; y < map.length; y++){
             for (let x = 0; x < map[y].length; x++){
@@ -114,37 +117,44 @@ class BFS extends Algorithm{
     }
 
     run(){
-        let cur = startNode;
-        let counter = 0;
-        this.visited = []
-        this.queue = []
-        this.visited.push(cur);
-        this.current = cur;
-        while (this.current.x != goalNode.x || this.current.y != goalNode.y){
-            this.current.findChildren();
-            
-            for (let b = 0; b < this.current.children.length; b++){
-                if (this.visited.includes(this.current.children[b]) == false && this.queue.includes(this.current.children[b]) == false && this.current.children[b].wall == false){
-                    this.current.children[b].parent = this.current
-                    this.queue.push(this.current.children[b]);
+            let cur = startNode;
+            let counter = 0;
+            this.visited = []
+            this.queue = []
+            this.visited.push(cur);
+            this.current = cur;
+            while (this.current.x != goalNode.x || this.current.y != goalNode.y){
+                this.current.findChildren();
+                
+                for (let b = 0; b < this.current.children.length; b++){
+                    if (this.visited.includes(this.current.children[b]) == false && this.queue.includes(this.current.children[b]) == false && this.current.children[b].wall == false){
+                        this.current.children[b].parent = this.current
+                        this.queue.push(this.current.children[b]);
+                    }
                 }
+
+                let toAdd = this.queue[0];
+
+                if (this.visited.includes(this.queue[0]) == true){
+                } else{
+                    this.current = this.queue.shift()
+                }
+
+                this.visited.push(toAdd);
+                if (this.queue[0]){
+                } else {
+                    this.color();
+                }
+                counter++;
             }
-
-            let toAdd = this.queue[0];
-
-            if (this.visited.includes(this.queue[0]) == true){
-            } else{
-                this.current = this.queue.shift()
-            }
-
-            this.visited.push(toAdd);
-            counter++;
+            this.color()
+            this.traceBack(this.current);
+            this.effPath()
         }
-        this.color()
-        this.traceBack(this.current)
-        this.effPath()
+        
     }
-}
+    
+    
 
 
 let BFSal = new BFS()
@@ -166,11 +176,13 @@ function createMap(width, height){
             nodes[i][j].tile.style.height = "50px"  
             nodes[i][j].tile.style.border = "3px solid black"
             nodes[i][j].tile.addEventListener("click", function(){
-                if(nodes[i][j].wall == true){
-                    nodes[i][j].wall = false;
+                if (nodes[i][j].x == goalNode.x && nodes[i][j].y == goalNode.y){
                 } else{
-                    nodes[i][j].wall = true; 
-                }
+                    if(nodes[i][j].wall == true){
+                        nodes[i][j].wall = false;
+                    } else{
+                        nodes[i][j].wall = true; 
+                }}
                 BFSal.buildBoard(startNode,goalNode);})
             row.appendChild(nodes[i][j].tile)
             x++;
@@ -185,17 +197,20 @@ function createMap(width, height){
 }
 
 document.getElementById("submit").addEventListener("click", function(){
-    startNode = map[Number(document.getElementById("startY").value)][Number(document.getElementById("startX").value)]
-    goalNode = map[Number(document.getElementById("goalY").value)][Number(document.getElementById("goalX").value)]
-    let height = Number(document.getElementById("height").value)
-    let width = Number(document.getElementById("width").value)
-    map = createMap(width, height)
-    for (let i = 0; i < height; i++){
-        for (let j = 0; j < width; j++){
-            if (map[j][i]){
-                map[j][i].wall = false}
-        }}
-    BFSal.buildBoard(startNode, goalNode)
+    try{
+        startNode = map[Number(document.getElementById("startY").value)][Number(document.getElementById("startX").value)]
+        goalNode = map[Number(document.getElementById("goalY").value)][Number(document.getElementById("goalX").value)]
+        let height = Number(document.getElementById("height").value)
+        let width = Number(document.getElementById("width").value)
+        map = createMap(width, height)
+        for (let i = 0; i < height; i++){
+            for (let j = 0; j < width; j++){
+                    map[i][j].wall = false
+            }}
+        BFSal.buildBoard(startNode, goalNode)
+    } catch (error){
+        window.alert("Please make sure that the start and end values for your nodes are inside the grid. Keep in mind that the first column and row each start from a value of 0!")
+    }
 })
 
 window.addEventListener("load", function(){
@@ -206,5 +221,7 @@ window.addEventListener("load", function(){
 })
 
 document.getElementById("run").addEventListener("click", function(){
+    startNode = map[Number(document.getElementById("startY").value)][Number(document.getElementById("startX").value)]
+    goalNode = map[Number(document.getElementById("goalY").value)][Number(document.getElementById("goalX").value)]
     BFSal.run()
 })

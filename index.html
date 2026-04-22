@@ -5,6 +5,7 @@
 </head>
 
 <body id = "body">
+    <h1>Pathfinding!</h1>
 
     <div id = "container">
         <table id = "table">
@@ -21,8 +22,10 @@
         End Y: <input type = "text" id = "goalY" value="8">
         End X:<input type = "text" id = "goalX" value="8">
         <br>
-        <input type = "text" id = "startX" value="0">
-        <input type = "text" id = "startY" value="0">  
+        Start Y:<input type = "text" id = "startY" value="0"> 
+        Start X:<input type = "text" id = "startX" value="0">
+        <br>
+        Algorithm <select><option value = "BFS">BFS</option></select>
         <br>
         <button id = "submit">Build Board</button>
         <button id = "run">Find Path</button>
